@@ -3,6 +3,7 @@ package project.todo.controller;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import project.todo.dto.ResponseDTO;
 import project.todo.dto.ToDoDTO;
@@ -30,13 +31,14 @@ public class ToDoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createToDo(@RequestBody ToDoDTO dto) {
+    public ResponseEntity<?> createToDo(@AuthenticationPrincipal String userId,
+                                        @RequestBody ToDoDTO dto) {
         try {
-            String temporaryUserId = "temporary-user";
+            //String temporaryUserId = "temporary-user";
 
             ToDoEntity entity = ToDoDTO.toEntity(dto);
             entity.setId(null);
-            entity.setUserId(temporaryUserId);
+            entity.setUserId(userId);
 
             List<ToDoEntity> entities = service.create(entity);
 
@@ -55,10 +57,9 @@ public class ToDoController {
     }
 
     @GetMapping
-    ResponseEntity<?> retrieveToDoList() {
-        String temporaryUserId = "temporary-user";
+    ResponseEntity<?> retrieveToDoList(@AuthenticationPrincipal String userId) {
 
-        List<ToDoEntity> entities = service.retrieve(temporaryUserId);
+        List<ToDoEntity> entities = service.retrieve(userId);
 
         List<ToDoDTO> dtos = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
 
@@ -68,11 +69,11 @@ public class ToDoController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateToDo(@RequestBody ToDoDTO dto) {
-        String temporaryUserId = "temporary-user";
+    public ResponseEntity<?> updateToDo(@AuthenticationPrincipal String userId,
+                                        @RequestBody ToDoDTO dto) {
 
         ToDoEntity entity = ToDoDTO.toEntity(dto);
-        entity.setUserId(temporaryUserId);
+        entity.setUserId(userId);
         List<ToDoEntity> entities = service.update(entity);
 
         List<ToDoDTO> dtos = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
@@ -82,12 +83,12 @@ public class ToDoController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteToDo(@RequestBody ToDoDTO dto) {
+    public ResponseEntity<?> deleteToDo(@AuthenticationPrincipal String userId,
+                                        @RequestBody ToDoDTO dto) {
         try {
-            String temporaryUserId = "temporary-user";
 
             ToDoEntity entity = ToDoDTO.toEntity(dto);
-            entity.setUserId(temporaryUserId);
+            entity.setUserId(userId);
             List<ToDoEntity> entities = service.delete(entity);
 
             List<ToDoDTO> dtos = entities.stream().map(ToDoDTO::new).collect(Collectors.toList());
