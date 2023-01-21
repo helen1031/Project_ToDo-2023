@@ -36,14 +36,13 @@ public class UserController {
             }
             UserEntity user = UserEntity.builder()
                     .username(userDTO.getUsername())
-                    .password(userDTO.getPassword())
+                    .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
             UserEntity registeredUser = userService.create(user);
             UserDTO responseUserDTO = UserDTO.builder()
                     .id(registeredUser.getId())
                     .username(registeredUser.getUsername())
                     .build();
-
             return ResponseEntity.ok().body(responseUserDTO);
         } catch (Exception e) {
             ResponseDTO responseDTO = ResponseDTO.builder().error(e.getMessage()).build();
